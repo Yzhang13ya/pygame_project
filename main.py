@@ -1,46 +1,50 @@
+"""
+Jump and Math - Main Entry Point
+A platformer game that combines jumping mechanics with math challenges.
+Players must solve math questions to continue after dying.
+"""
+
 import pygame
-from settings import SCREEN_WIDTH, SCREEN_HEIGHT, FPS
-from player import Player
-from footing import Footing  # Platform renamed as Footing
+import sys
+from game.game_manager import GameManager
+from game.resource_manager import ResourceManager
 
-pygame.init()
+def main():
+    # Initialize Pygame engine and mixer with error handling
+    try:
+        pygame.init()
+        if not pygame.mixer.get_init():
+            pygame.mixer.init()
+    except pygame.error as e:
+        print(f"Error initializing Pygame: {e}")
+        sys.exit(1)
 
-# Set up the game window
-screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-pygame.display.set_caption("Jump or Math")
+    # Initialize display screen
+    try:
+        screen = pygame.display.set_mode((500, 800))
+        pygame.display.set_caption("Jump and Math")
+    except pygame.error as e:
+        print(f"Error setting up display: {e}")
+        sys.exit(1)
 
+    try:
+        # Initialize resource manager
+        ResourceManager.initialize()
+        
+        # Create game manager instance and run game
+        game = GameManager(screen)
+        
+        # Main game loop
+        running = True
+        while running:
+            running = game.run()
 
-clock = pygame.time.Clock()
+    except Exception as e:
+        print(f"Error in main: {e}")
+        sys.exit(1)
+    finally:
+        pygame.quit()
+        sys.exit()
 
-# Create player object (ball) at starting position
-player = Player(100, 500)
-
-# Create footing object (platform) at position
-footing = Footing(200, 400)
-
-running = True
-while running:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_SPACE:
-                player.jump()  # Make the player jump when spacebar is pressed
-
-    # Update player state
-    player.update()
-
-    # Fill the screen with a light blue background
-    screen.fill((135, 206, 235))
-
-    # Draw footing (platform) and player (ball)
-    footing.draw(screen)
-    player.draw(screen)
-
-    # Update the display
-    pygame.display.flip()
-
-    clock.tick(FPS)
-
-pygame.quit()
-
+if __name__ == "__main__":
+    main() 
